@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author Frank
+ *
  */
 public class ArenaToJava extends Application {
     private BufferedImage capture = null;
@@ -44,7 +44,6 @@ public class ArenaToJava extends Application {
         imageView.setFitWidth(640);
         imageView.setFitHeight(360);
         
-        //Test 2
         Button btn = new Button();
         btn.setText("Start importing Resolume");
         btn.setOnAction(new EventHandler<ActionEvent>() {
