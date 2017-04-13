@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -38,16 +39,15 @@ public class SQL
            
             try{
                 String sqlQuery = "UPDATE glowstick SET Red = ?, Green = ?, Blue = ? WHERE ID = ?;";
-                PreparedStatement pstmt = myConn.prepareStatement(sqlQuery);
-                pstmt.setInt(1, color.getRed());
-                pstmt.setInt(2, color.getGreen());
-                pstmt.setInt(3, color.getBlue());
-                pstmt.setInt(4, id);
-                pstmt.executeUpdate();
-            
-                pstmt.close(); 
+                try (PreparedStatement pstmt = myConn.prepareStatement(sqlQuery)) {
+                    pstmt.setInt(1, color.getRed());
+                    pstmt.setInt(2, color.getGreen());
+                    pstmt.setInt(3, color.getBlue());
+                    pstmt.setInt(4, id);
+                    pstmt.executeUpdate();
+                } 
             }
-            catch(Exception e){
+            catch(SQLException e){
                 System.out.println(e);
             }
         }
@@ -64,17 +64,16 @@ public class SQL
                         String sqlQuery = "INSERT INTO glowstick (ID, Red, Green, Blue) VALUES (?, ?, ?, ?) "
                                 + "ON DUPLICATE KEY UPDATE Red = ?, Green = ?, Blue = ?;";
                         
-                        PreparedStatement pstmt = myConn.prepareStatement(sqlQuery);
-                        pstmt.setInt(1, i++);
-                        pstmt.setInt(2, imgData[x][y].getRed());
-                        pstmt.setInt(3, imgData[x][y].getGreen());
-                        pstmt.setInt(4, imgData[x][y].getBlue());
-                        pstmt.setInt(5, imgData[x][y].getRed());
-                        pstmt.setInt(6, imgData[x][y].getGreen());
-                        pstmt.setInt(7, imgData[x][y].getBlue());
-                        pstmt.executeUpdate();
-
-                        pstmt.close(); 
+                        try (PreparedStatement pstmt = myConn.prepareStatement(sqlQuery)) {
+                            pstmt.setInt(1, i++);
+                            pstmt.setInt(2, imgData[x][y].getRed());
+                            pstmt.setInt(3, imgData[x][y].getGreen());
+                            pstmt.setInt(4, imgData[x][y].getBlue());
+                            pstmt.setInt(5, imgData[x][y].getRed());
+                            pstmt.setInt(6, imgData[x][y].getGreen());
+                            pstmt.setInt(7, imgData[x][y].getBlue());
+                            pstmt.executeUpdate();
+                        } 
                     }
                 }
             }
