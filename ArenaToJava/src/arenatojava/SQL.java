@@ -16,12 +16,14 @@ import java.sql.Statement;
  *
  * @author Frank
  */
-public class SQL {
+public class SQL
+{
     Connection myConn = null;
         Statement myStmt = null;
         ResultSet myRs = null;
         
-        public SQL(){
+        public SQL()
+        {
             try{
                 myConn = DriverManager.getConnection("jdbc:mysql://studmysql01.fhict.local/dbi310878", "dbi310878", "Iie72-HD");
                 myStmt = myConn.createStatement();     
@@ -31,7 +33,8 @@ public class SQL {
             }
         }
         
-        public void updateColors(Color color, int id){
+        public void updateColors(Color color, int id)
+        {
            
             try{
                 String sqlQuery = "UPDATE glowstick SET Red = ?, Green = ?, Blue = ? WHERE ID = ?;";
@@ -43,6 +46,37 @@ public class SQL {
                 pstmt.executeUpdate();
             
                 pstmt.close(); 
+            }
+            catch(Exception e){
+                System.out.println(e);
+            }
+        }
+        
+        public void updateColors(Color[][] imgData, int width, int height)
+        {
+            try
+            {
+                int i = 1;
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        String sqlQuery = "INSERT INTO glowstick (ID, Red, Green, Blue) VALUES (?, ?, ?, ?) "
+                                + "ON DUPLICATE KEY UPDATE Red = ?, Green = ?, Blue = ?;";
+                        
+                        PreparedStatement pstmt = myConn.prepareStatement(sqlQuery);
+                        pstmt.setInt(1, i++);
+                        pstmt.setInt(2, imgData[x][y].getRed());
+                        pstmt.setInt(3, imgData[x][y].getGreen());
+                        pstmt.setInt(4, imgData[x][y].getBlue());
+                        pstmt.setInt(5, imgData[x][y].getRed());
+                        pstmt.setInt(6, imgData[x][y].getGreen());
+                        pstmt.setInt(7, imgData[x][y].getBlue());
+                        pstmt.executeUpdate();
+
+                        pstmt.close(); 
+                    }
+                }
             }
             catch(Exception e){
                 System.out.println(e);

@@ -29,7 +29,8 @@ import net.coobird.thumbnailator.Thumbnails;
  *
  *
  */
-public class ArenaToJava extends Application {
+public class ArenaToJava extends Application
+{
     private BufferedImage capture = null;
     Rectangle screenRect = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDefaultConfiguration().getBounds();
     SQL sql = new SQL();
@@ -67,15 +68,19 @@ public class ArenaToJava extends Application {
                                 RT = averageColor(capture, (screenRect.width / 2), 0, (screenRect.width / 2), (screenRect.height / 2));
                                 RB = averageColor(capture, (screenRect.width / 2), (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
                                 
-                                capture = resize(capture, 50, 50);
+                                capture = new Converter().Resize(capture, 10, 10);
+                                
+                                Color colors[][] = new Converter().ImageToData(capture);
                                 
                                 Image x = SwingFXUtils.toFXImage(capture, null);
                                 imageView.setImage(x);
 
-                                sql.updateColors(LT, 10);
-                                sql.updateColors(LB, 12);
-                                sql.updateColors(RT, 13);
-                                sql.updateColors(RB, 14);
+                                sql.updateColors(colors, 10, 10);
+                                
+                                //sql.updateColors(LT, 10);
+                                //sql.updateColors(LB, 12);
+                                //sql.updateColors(RT, 13);
+                                //sql.updateColors(RB, 14);
 
 
                                 Platform.runLater(new Runnable()
@@ -138,10 +143,5 @@ public class ArenaToJava extends Application {
         int green = (int) (sumg / num);
         int blue = (int) (sumb / num);
         return new Color(red, green, blue);
-    }
-    
-    public static BufferedImage resize(BufferedImage img, int newW, int newH) throws IOException
-    {
-        return Thumbnails.of(img).forceSize(newW, newH).asBufferedImage();
     }
 }
