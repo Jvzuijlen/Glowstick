@@ -23,6 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import net.coobird.thumbnailator.Thumbnails;
 
 /**
  *
@@ -37,12 +38,14 @@ public class ArenaToJava extends Application {
     Color LB;
     Color RT;
     Color RB;
+    int windowWidth = 1000;
+    int windowHeight = 1000;
     
     @Override
     public void start(Stage primaryStage) {
         ImageView imageView = new ImageView();
-        imageView.setFitWidth(640);
-        imageView.setFitHeight(360);
+        imageView.setFitWidth(windowWidth);
+        imageView.setFitHeight(windowHeight);
         
         Button btn = new Button();
         btn.setText("Start importing Resolume");
@@ -52,36 +55,43 @@ public class ArenaToJava extends Application {
             public void handle(ActionEvent event) {
                 new Thread(new Runnable() {
                     @Override
-                    public void run() {
-                    for(;;){
-                        try {
-                        capture = new Robot().createScreenCapture(screenRect);
-                        LT = averageColor(capture, 0,0, (screenRect.width / 2 - 10), (screenRect.height / 2 - 10));
-                        LB = averageColor(capture, 0, (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
-                        RT = averageColor(capture, (screenRect.width / 2), 0, (screenRect.width / 2), (screenRect.height / 2));
-                        RB = averageColor(capture, (screenRect.width / 2), (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
-                      
-                        Image x = SwingFXUtils.toFXImage(capture, null);
-                        imageView.setImage(x);
-                        
-                        sql.updateColors(LT, 10);
-                        sql.updateColors(LB, 12);
-                        sql.updateColors(RT, 13);
-                        sql.updateColors(RB, 14);
-                        
-                        
-                        Platform.runLater(new Runnable(){
-                            @Override
-                            public void run() {
-                                 primaryStage.setTitle(LT.toString() + " : " + LB.toString() + " : " + RT.toString() + " : " + RB.toString());
+                    public void run()
+                    {
+                        for(;;)
+                        {
+                            try 
+                            {
+                                capture = new Robot().createScreenCapture(screenRect);
+                                LT = averageColor(capture, 0,0, (screenRect.width / 2 - 10), (screenRect.height / 2 - 10));
+                                LB = averageColor(capture, 0, (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
+                                RT = averageColor(capture, (screenRect.width / 2), 0, (screenRect.width / 2), (screenRect.height / 2));
+                                RB = averageColor(capture, (screenRect.width / 2), (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
+                                
+                                capture = resize(capture, 50, 50);
+                                
+                                Image x = SwingFXUtils.toFXImage(capture, null);
+                                imageView.setImage(x);
+
+                                sql.updateColors(LT, 10);
+                                sql.updateColors(LB, 12);
+                                sql.updateColors(RT, 13);
+                                sql.updateColors(RB, 14);
+
+
+                                Platform.runLater(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                         primaryStage.setTitle(LT.toString() + " : " + LB.toString() + " : " + RT.toString() + " : " + RB.toString());
+                                    }
+                                });
                             }
-                            
-                        });
-                       
-                        } catch (Exception e) {
-                        System.out.println(e);
-                        }
-                    }    
+                            catch (Exception e)
+                            {
+                                System.out.println(e);
+                            }
+                        }    
                     }
                 }).start();
             }
@@ -91,7 +101,7 @@ public class ArenaToJava extends Application {
         root.getChildren().add(btn);
         root.getChildren().add(imageView);
         
-        Scene scene = new Scene(root, 640, 360);
+        Scene scene = new Scene(root, windowWidth, windowHeight);
         
         primaryStage.setTitle("Glow Sticks Control");
         primaryStage.setScene(scene);
@@ -101,28 +111,37 @@ public class ArenaToJava extends Application {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws AWTException, IOException {
+    public static void main(String[] args) throws AWTException, IOException
+    {
         launch(args);
-        }
-    
-    public static Color averageColor(BufferedImage bi, int x0, int y0, int w, int h) {
-    int x1 = x0 + w;
-    int y1 = y0 + h;
-    long sumr = 0, sumg = 0, sumb = 0;
-    int num = 0;
-    for (int x = x0; x < x1; x++) {
-        for (int y = y0; y < y1; y++) {
-            Color pixel = new Color(bi.getRGB(x, y));
-            sumr += pixel.getRed();
-            sumg += pixel.getGreen();
-            sumb += pixel.getBlue();
-            num++;
-        }
     }
     
-    int red = (int) (sumr / num);
-    int green = (int) (sumg / num);
-    int blue = (int) (sumb / num);
-    return new Color(red, green, blue);
-}
+    public static Color averageColor(BufferedImage bi, int x0, int y0, int w, int h)
+    {
+        int x1 = x0 + w;
+        int y1 = y0 + h;
+        long sumr = 0, sumg = 0, sumb = 0;
+        int num = 0;
+        for (int x = x0; x < x1; x++)
+        {
+            for (int y = y0; y < y1; y++)
+            {
+                Color pixel = new Color(bi.getRGB(x, y));
+                sumr += pixel.getRed();
+                sumg += pixel.getGreen();
+                sumb += pixel.getBlue();
+                num++;
+            }
+        }
+    
+        int red = (int) (sumr / num);
+        int green = (int) (sumg / num);
+        int blue = (int) (sumb / num);
+        return new Color(red, green, blue);
+    }
+    
+    public static BufferedImage resize(BufferedImage img, int newW, int newH) throws IOException
+    {
+        return Thumbnails.of(img).forceSize(newW, newH).asBufferedImage();
+    }
 }
