@@ -68,14 +68,14 @@ public class ArenaToJava extends Application
                                 RT = averageColor(capture, (screenRect.width / 2), 0, (screenRect.width / 2), (screenRect.height / 2));
                                 RB = averageColor(capture, (screenRect.width / 2), (screenRect.height / 2), (screenRect.width / 2), (screenRect.height / 2));
                                 
-                                capture = new Converter().Resize(capture, 10, 10);
+                                capture = new Converter().Resize(capture, 100, 100);
                                 
                                 Color colors[][] = new Converter().ImageToData(capture);
                                 
                                 Image x = SwingFXUtils.toFXImage(capture, null);
                                 imageView.setImage(x);
 
-                                sql.updateColors(colors, 10, 10);
+                                sql.updateColors(colors, 100, 100);
                                 
                                 //sql.updateColors(LT, 10);
                                 //sql.updateColors(LB, 12);
